@@ -482,12 +482,13 @@
   function makeQR(){
     var box=document.getElementById('qrbox');
     if(!box) return;
-    if(window.QRCode){
-      box.innerHTML='';
-      new QRCode(box,{text:SITE_URL,width:158,height:158,colorDark:'#16110d',colorLight:'#faf6ee',correctLevel:QRCode.CorrectLevel.M});
-    }else{
-      box.innerHTML='<img alt="QR" width="158" height="158" src="https://api.qrserver.com/v1/create-qr-code/?size=158x158&margin=0&color=16110d&bgcolor=faf6ee&data='+encodeURIComponent(SITE_URL)+'">';
-    }
+    var img=new Image();
+    img.width=158;img.height=158;img.alt='Scan to open Corti menu';
+    img.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=12&ecc=M&color=22-17-13&bgcolor=250-246-238&data='+encodeURIComponent(SITE_URL);
+    img.onerror=function(){
+      if(window.QRCode){box.innerHTML='';new QRCode(box,{text:SITE_URL,width:158,height:158,correctLevel:QRCode.CorrectLevel.M});}
+    };
+    box.innerHTML='';box.appendChild(img);
   }
   if(document.readyState!=='loading')makeQR();else document.addEventListener('DOMContentLoaded',makeQR);
   const CUP='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.2"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3c0 1-.8 1.5-.8 2.5M11.5 3c0 1-.8 1.5-.8 2.5" stroke-linecap="round"/></svg>';
