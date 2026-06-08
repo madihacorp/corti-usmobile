@@ -307,13 +307,13 @@
         <div class="item" data-p="440" data-o="550"><div class="ic">{cup}</div><div><div class="iname">Americano</div><div class="iprice"><span class="strike">Rs 550</span><span class="now">Rs 440</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
         <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Latte</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
         <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Cappuccino</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
-        <div class="item" data-p="760" data-o="950"><div class="ic">{cup}</div><div><div class="iname">Flavoured Latte</div><div class="idesc">Caramel · hazelnut · coconut · vanilla · spanish</div><div class="iprice"><span class="strike">Rs 950</span><span class="now">Rs 760</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="760" data-o="950" data-fl="Caramel,Hazelnut,Coconut,Vanilla,Spanish"><div class="ic">{cup}</div><div><div class="iname">Flavoured Latte</div><div class="idesc">Caramel · hazelnut · coconut · vanilla · spanish</div><div class="iprice"><span class="strike">Rs 950</span><span class="now">Rs 760</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
         <div class="item" data-p="560" data-o="700"><div class="ic">{cup}</div><div><div class="iname">Cortado</div><div class="iprice"><span class="strike">Rs 700</span><span class="now">Rs 560</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
 
         <div class="cat"><span>Cold Brews</span><div class="hair"></div></div>
         <div class="item" data-p="480" data-o="600"><div class="ic">{cup}</div><div><div class="iname">Iced Americano</div><div class="iprice"><span class="strike">Rs 600</span><span class="now">Rs 480</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
         <div class="item" data-p="784" data-o="980"><div class="ic">{cup}</div><div><div class="iname">Iced Latte</div><div class="iprice"><span class="strike">Rs 980</span><span class="now">Rs 784</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
-        <div class="item" data-p="816" data-o="1020"><div class="ic">{cup}</div><div><div class="iname">Flavoured Iced Latte</div><div class="idesc">Caramel · hazelnut · coconut · vanilla · spanish</div><div class="iprice"><span class="strike">Rs 1,020</span><span class="now">Rs 816</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="816" data-o="1020" data-fl="Caramel,Hazelnut,Coconut,Vanilla,Spanish"><div class="ic">{cup}</div><div><div class="iname">Flavoured Iced Latte</div><div class="idesc">Caramel · hazelnut · coconut · vanilla · spanish</div><div class="iprice"><span class="strike">Rs 1,020</span><span class="now">Rs 816</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
 
         <div class="cat"><span>Frappe</span><div class="hair"></div></div>
         <div class="item" data-p="920" data-o="1150"><div class="ic">{cup}</div><div><div class="iname">Hazelnut Frappe</div><div class="iprice"><span class="strike">Rs 1,150</span><span class="now">Rs 920</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
@@ -648,7 +648,29 @@
       : '<button class="add" onclick="addOne(this)">+</button>';
   }
   function idx(b){return [...items()].indexOf(b.closest('[data-p]'))}
-  function addOne(b){let i=idx(b);cart[i]=(cart[i]||0)+1;render(b.closest('[data-p]'),i);bar()}
+  function addOne(b){
+    const it=b.closest('[data-p]');
+    if(it.dataset.fl){openFlavour(it);return;}
+    const i=idx(b);cart[i]=(cart[i]||0)+1;render(it,i);bar();
+  }
+
+  /* flavour picker */
+  let flItem=null, tmpFl='';
+  function openFlavour(it){
+    flItem=it; tmpFl='';
+    const name=it.querySelector('.iname').textContent;
+    const html=it.dataset.fl.split(',').map(f=>'<div class="voteopt" onclick="selFl(this)"><div class="vradio"></div><div class="vn">'+f.trim()+'</div></div>').join('');
+    openSheet('<div class="sh-title">Choose your flavour</div><div class="sh-sub">'+name+'</div><div class="votes">'+html+'</div><div class="sh-actions"><button class="btn ghost" onclick="closeSheet()">Cancel</button><button class="btn" onclick="confirmFl()">Add to order</button></div>');
+  }
+  function selFl(el){el.parentElement.querySelectorAll('.voteopt').forEach(v=>v.classList.remove('on'));el.classList.add('on');tmpFl=el.querySelector('.vn').textContent}
+  function confirmFl(){
+    if(!tmpFl){toast('Pick a flavour first');return;}
+    const i=[...items()].indexOf(flItem);
+    cart[i]=(cart[i]||0)+1;
+    const d=flItem.querySelector('.idesc'); if(d) d.textContent=tmpFl+' selected';
+    render(flItem,i); bar(); closeSheet();
+    toast('Added '+flItem.querySelector('.iname').textContent+' · '+tmpFl);
+  }
   function plus(b){let i=idx(b);cart[i]++;render(b.closest('[data-p]'),i);bar()}
   function minus(b){let i=idx(b);cart[i]--;if(cart[i]<=0)delete cart[i];render(b.closest('[data-p]'),i);bar()}
   function bar(){
