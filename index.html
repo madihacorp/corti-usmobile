@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corti × US Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16110d; --bg2:#1d1712; --card:#211a14; --line:#352a20;
+    --cream:#efe7db; --muted:#9b8d7e; --gold:#c9a86a; --gold2:#e3c789; --green:#6f9f6f;
+    --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:var(--sans);background:#0c0907;color:var(--cream);display:flex;justify-content:center;min-height:100vh}
+  .phone{width:100%;max-width:430px;background:radial-gradient(120% 55% at 50% 0%,#221a13 0%,var(--bg) 55%);
+    min-height:100vh;position:relative;display:flex;flex-direction:column;box-shadow:0 0 80px rgba(0,0,0,.7);overflow:hidden}
+  .screen{display:none;flex:1;flex-direction:column;animation:fade .35s ease}
+  .screen.active{display:flex}
+  .tab{display:none;animation:fade .3s ease}
+  .tab.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .center{justify-content:center;align-items:center;text-align:center;padding:48px 30px;flex:1;display:flex;flex-direction:column}
+  .gold{color:var(--gold)}
+  .hair{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+  .kicker{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+  /* QR */
+  .brand{font-family:var(--serif);font-size:38px;font-weight:700;line-height:1;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;line-height:1.6;margin-top:14px;max-width:300px}
+  .qrframe{margin:30px auto 0;padding:16px;background:#faf6ee;border-radius:18px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+  .qrframe::after{content:"CORTI";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%) translateY(50%);
+    font-family:var(--serif);font-weight:700;font-size:11px;letter-spacing:3px;color:#16110d;background:#faf6ee;padding:4px 10px;border-radius:8px}
+  .scanbtn{margin-top:40px;padding:15px 30px;border-radius:40px;border:1px solid var(--gold);background:transparent;
+    color:var(--gold2);font-size:13px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:.25s}
+  .scanbtn:hover{background:var(--gold);color:#1a130c}
+
+  /* header */
+  .hero{padding:22px 22px 14px;position:relative}
+  .hrow{display:flex;align-items:center;gap:10px}
+  .hbrand{font-family:var(--serif);font-size:23px;font-weight:700}
+  .table{margin-left:auto;font-size:11px;letter-spacing:1px;color:var(--muted);border:1px solid var(--line);padding:6px 12px;border-radius:30px;font-weight:600}
+
+  /* banners */
+  .banner{margin:14px 22px 0;border:1px solid var(--line);border-radius:14px;padding:13px 16px;
+    background:linear-gradient(135deg,#241c12,#1c1610);display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
+  .banner::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 140% at 0% 0%,rgba(201,168,106,.14),transparent 60%)}
+  .banner .bt{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--gold2);position:relative}
+  .banner .bs{font-size:12px;color:var(--muted);margin-top:1px;position:relative}
+  .seal{margin-left:auto;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-weight:700;color:var(--gold2);font-size:14px;position:relative;flex-shrink:0}
+
+  /* order mode toggle */
+  .modes{display:flex;gap:8px;margin:16px 22px 0}
+  .mode{flex:1;text-align:center;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--card);
+    font-size:12px;color:var(--muted);cursor:pointer;font-weight:600;letter-spacing:.3px;transition:.2s}
+  .mode.on{border-color:var(--gold);background:#2a2014;color:var(--gold2)}
+  .mode small{display:block;font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
+  .mode.on small{color:var(--gold)}
+
+  .body{padding:6px 22px 150px;overflow:auto;flex:1}
+  .cat{display:flex;align-items:center;gap:12px;margin:22px 0 4px}
+  .cat span{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .cat .hair{flex:1}
+
+  .item{display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid rgba(53,42,32,.6)}
+  .ic{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .iname{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.1}
+  .idesc{font-size:11px;color:var(--muted);margin-top:3px}
+  .iprice{margin-top:5px;font-size:13px}
+  .strike{color:var(--muted);text-decoration:line-through;margin-right:7px;font-size:12px}
+  .now{color:var(--gold2);font-weight:700}
+  .tagm{display:inline-block;font-size:9px;letter-spacing:1px;color:#1a130c;background:var(--gold);border-radius:5px;padding:2px 6px;margin-left:8px;font-weight:700;vertical-align:middle}
+  .qty{margin-left:auto}
+  .add{width:38px;height:38px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold2);
+    font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .add:hover{background:var(--gold);color:#1a130c}
+  .has .add{display:none}
+  .stepper{display:none;align-items:center;gap:14px}
+  .has .stepper{display:flex}
+  .sbtn{width:32px;height:32px;border-radius:10px;border:none;background:#2c2217;color:var(--gold2);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .sbtn:hover{background:var(--gold);color:#1a130c}
+  .qn{min-width:16px;text-align:center;font-weight:700;font-size:16px;font-family:var(--serif)}
+
+  /* combo card */
+  .combo{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--line);border-radius:16px;margin-top:10px;background:linear-gradient(135deg,#231b13,#1a140f)}
+  .combo .cn{font-family:var(--serif);font-size:19px;font-weight:600}
+  .combo .cd{font-size:11px;color:var(--muted);margin-top:2px}
+  .combo .cp{font-size:13px;margin-top:5px}
+
+  /* office tab */
+  .panel{border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:16px;background:linear-gradient(135deg,#221a12,#1a140f)}
+  .ph{font-family:var(--serif);font-size:24px;font-weight:700}
+  .pp{font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px}
+  .tiers{margin-top:16px}
+  .tier{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(53,42,32,.6);font-size:14px}
+  .tier:last-child{border:none}
+  .tier .tq{font-family:var(--serif);font-weight:700;color:var(--gold2);width:74px}
+  .tier .tg{margin-left:auto;font-weight:700;color:var(--green)}
+  .speed{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:13px;color:var(--cream)}
+  .ic2{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+  /* toast */
+  .toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
+    background:#2a2014;border:1px solid var(--gold);color:var(--gold2);padding:12px 18px;border-radius:30px;
+    font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;white-space:nowrap;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* perk toggle */
+  .ptoggle{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--gold2);
+    border:1px solid var(--gold);border-radius:30px;padding:7px 14px;transition:.2s}
+  .perk{cursor:pointer}
+  .perk.on .ptoggle{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* event action / rsvp cancel */
+  .evaction{margin-top:14px}
+  .evcancel{margin-top:10px;text-align:center;font-size:12px;color:var(--muted)}
+  .evcancel b{color:var(--gold2)}
+  .evcancel a{color:var(--red,#c0644f);text-decoration:underline;cursor:pointer;font-weight:600;margin-left:6px}
+
+  /* bottom sheet */
+  .sheet{position:absolute;inset:0;z-index:60;display:none}
+  .sheet.show{display:block}
+  .sheet-bg{position:absolute;inset:0;background:rgba(6,4,3,.65);backdrop-filter:blur(2px);animation:fade .25s ease}
+  .sheet-card{position:absolute;left:0;bottom:0;width:100%;background:var(--bg2);border-top:1px solid var(--line);
+    border-radius:24px 24px 0 0;padding:10px 22px 26px;max-height:86%;overflow:auto;
+    transform:translateY(100%);animation:sheetUp .35s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes sheetUp{to{transform:translateY(0)}}
+  .grab{width:42px;height:4px;border-radius:4px;background:var(--line);margin:0 auto 16px}
+  .sh-title{font-family:var(--serif);font-size:24px;font-weight:700;line-height:1.15}
+  .sh-sub{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.5}
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+  .slot{text-align:center;padding:13px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card);
+    font-size:14px;font-weight:600;cursor:pointer;transition:.18s}
+  .slot.on{border-color:var(--gold);background:#2a2014;color:var(--gold2)}
+  .field{margin-top:16px}
+  .field label{display:block;font-size:12px;letter-spacing:.5px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .field input,.field textarea,.field select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);
+    background:var(--card);color:var(--cream);font-size:14px;font-family:var(--sans)}
+  .field textarea{resize:none;min-height:74px}
+  .field input::placeholder,.field textarea::placeholder{color:#6f6357}
+  .sh-actions{display:flex;gap:10px;margin-top:22px}
+  .sh-actions .btn{flex:1;margin:0}
+  .sh-actions .btn.ghost{margin:0}
+  .votes{margin-top:18px}
+  .voteopt{display:flex;align-items:center;gap:13px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;cursor:pointer;transition:.18s}
+  .voteopt.on{border-color:var(--gold);background:#2a2014}
+  .voteopt .vradio{width:20px;height:20px;border-radius:50%;border:1px solid var(--line);flex-shrink:0}
+  .voteopt.on .vradio{border-color:var(--gold2);background:var(--gold2);box-shadow:inset 0 0 0 4px var(--bg2)}
+  .voteopt .vn{font-family:var(--serif);font-size:18px;font-weight:600}
+
+  /* rewards */
+  .lcard{border:1px solid var(--gold);border-radius:18px;padding:22px;background:linear-gradient(135deg,#2a2013,#191309);position:relative;overflow:hidden;margin-top:16px}
+  .lcard::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,106,.18),transparent 70%)}
+  .ltier{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+  .lname{font-family:var(--serif);font-size:26px;font-weight:700;margin-top:2px}
+  .stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+  .stamp{aspect-ratio:1;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--line)}
+  .stamp.full{border-color:var(--gold);background:rgba(201,168,106,.12);color:var(--gold2)}
+  .stamp.free{border-style:dashed;border-color:var(--gold2);color:var(--gold2)}
+  .lnote{font-size:12px;color:var(--muted);margin-top:14px;text-align:center}
+  .perk{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(53,42,32,.6)}
+  .perk:last-child{border:none}
+  .perk .pi{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .perk .pn{font-weight:600;font-size:14px}
+  .perk .pd{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+
+  /* events */
+  .ev{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:16px;background:var(--card)}
+  .ev .evtop{height:96px;display:flex;align-items:flex-end;padding:14px 18px;position:relative}
+  .ev1 .evtop{background:linear-gradient(135deg,#3a2a16,#241a10)}
+  .ev2 .evtop{background:linear-gradient(135deg,#2c3320,#1a2012)}
+  .ev3 .evtop{background:linear-gradient(135deg,#33222c,#1f141b)}
+  .ev .evtag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);font-weight:700}
+  .ev .evb{padding:16px 18px}
+  .ev .evt{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1.1}
+  .ev .evd{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .evbtn{margin-top:14px;padding:11px;border-radius:11px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;width:100%;transition:.2s}
+  .evbtn:hover{background:var(--gold);color:#1a130c}
+  .evbtn.done{background:#23311f;border-color:var(--green);color:var(--green)}
+
+  .partner{text-align:center;padding:22px;border:1px dashed var(--line);border-radius:18px;margin-top:18px}
+  .partner .pk{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+  .partner .ptt{font-family:var(--serif);font-size:21px;font-weight:700;margin-top:6px;line-height:1.3}
+
+  /* cart */
+  .cart{position:absolute;bottom:74px;left:0;width:100%;padding:14px 22px 16px;
+    background:linear-gradient(180deg,rgba(22,17,13,0),var(--bg) 35%);
+    transform:translateY(140%);transition:transform .35s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+  .cart.show{transform:translateY(0);pointer-events:auto}
+  .csave{font-size:11px;text-align:center;color:var(--green);margin-bottom:9px;font-weight:600;min-height:13px}
+  .cbtn{width:100%;padding:16px 20px;border-radius:16px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a130c;display:flex;align-items:center;justify-content:space-between;box-shadow:0 12px 30px rgba(201,168,106,.25)}
+  .cbtn .c1{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px}
+  .ccount{background:#1a130c;color:var(--gold2);border-radius:9px;padding:4px 10px;font-size:13px}
+  .ctotal{font-family:var(--serif);font-size:20px;font-weight:700}
+
+  /* tab bar */
+  .tabbar{position:absolute;bottom:0;left:0;width:100%;height:74px;display:flex;border-top:1px solid var(--line);
+    background:rgba(18,14,10,.92);backdrop-filter:blur(10px)}
+  .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:var(--muted);font-size:10px;letter-spacing:.5px;transition:.2s}
+  .tb svg{stroke:currentColor}
+  .tb.on{color:var(--gold2)}
+
+  /* done */
+  .check{width:88px;height:88px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;color:var(--gold2)}
+  .dtitle{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1.15}
+  .eta{margin-top:24px;border:1px solid var(--line);border-radius:18px;padding:20px;width:100%;background:linear-gradient(135deg,#221a12,#1a140f)}
+  .eta .lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  .eta .big{font-family:var(--serif);font-size:38px;font-weight:700;color:var(--gold2);margin:4px 0}
+  .rate{margin-top:24px}
+  .rate .rq{font-size:13px;color:var(--muted);margin-bottom:12px}
+  .thumbs{display:flex;gap:14px;justify-content:center}
+  .thumb{width:54px;height:54px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .thumb:hover{border-color:var(--gold);color:var(--gold2)}
+  .thumb.pick{border-color:var(--green);color:var(--green);background:rgba(111,159,111,.12)}
+  .btn{display:block;width:100%;padding:15px;border-radius:14px;border:none;cursor:pointer;font-size:14px;font-weight:700;
+    background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a130c}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:600;margin-top:11px}
+  .footerpad{padding:26px 0 0;width:100%}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- QR -->
+  <section class="screen active" id="s-qr">
+    <div class="center">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.2"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3c0 1-.8 1.5-.8 2.5M11.5 3c0 1-.8 1.5-.8 2.5" stroke-linecap="round"/></svg>
+      <div class="brand"><span class="gold">Corti</span> Cafe</div>
+      <div class="kicker">Official Coffee Partner · US Mobile</div>
+      <p class="sub">Scan the card on your table. The menu opens instantly — no app, no sign-in.</p>
+      <div class="qrframe">
+        <svg width="158" height="158" viewBox="0 0 25 25" shape-rendering="crispEdges">
+          <rect width="25" height="25" fill="#faf6ee"/>
+          <g fill="#16110d">
+            <rect x="0" y="0" width="7" height="7"/><rect x="1" y="1" width="5" height="5" fill="#faf6ee"/><rect x="2" y="2" width="3" height="3"/>
+            <rect x="18" y="0" width="7" height="7"/><rect x="19" y="1" width="5" height="5" fill="#faf6ee"/><rect x="20" y="2" width="3" height="3"/>
+            <rect x="0" y="18" width="7" height="7"/><rect x="1" y="19" width="5" height="5" fill="#faf6ee"/><rect x="2" y="20" width="3" height="3"/>
+            <rect x="9" y="0" width="1" height="1"/><rect x="11" y="0" width="2" height="1"/><rect x="15" y="0" width="1" height="1"/>
+            <rect x="9" y="2" width="1" height="3"/><rect x="13" y="1" width="1" height="2"/><rect x="11" y="3" width="3" height="1"/>
+            <rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="3" height="1"/><rect x="17" y="9" width="2" height="2"/>
+            <rect x="0" y="9" width="1" height="2"/><rect x="3" y="9" width="2" height="1"/><rect x="5" y="11" width="2" height="2"/>
+            <rect x="22" y="9" width="2" height="2"/><rect x="20" y="11" width="1" height="3"/>
+            <rect x="9" y="13" width="1" height="3"/><rect x="12" y="13" width="3" height="2"/><rect x="16" y="14" width="2" height="1"/>
+            <rect x="9" y="18" width="2" height="1"/><rect x="13" y="17" width="1" height="3"/><rect x="16" y="18" width="3" height="2"/>
+            <rect x="9" y="21" width="3" height="1"/><rect x="14" y="22" width="2" height="2"/><rect x="18" y="22" width="1" height="2"/>
+            <rect x="22" y="16" width="2" height="2"/><rect x="20" y="20" width="3" height="1"/><rect x="22" y="22" width="2" height="2"/>
+          </g>
+        </svg>
+      </div>
+      <button class="scanbtn" onclick="go('s-id')">SCAN TO BEGIN</button>
+    </div>
+  </section>
+
+  <!-- IDENTIFY -->
+  <section class="screen" id="s-id">
+    <div class="center">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg>
+      <div class="brand" style="font-size:30px;margin-top:8px">Welcome</div>
+      <div class="kicker">Corti × US Mobile</div>
+      <p class="sub">Enter your US Mobile ID or name so we know who's ordering and where to bring it.</p>
+      <input id="who-input" placeholder="e.g. USM-2043  or  Ali Raza" style="width:100%;padding:15px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--cream);font-size:15px;margin-top:22px;text-align:center" onkeydown="if(event.key==='Enter')identify()">
+      <button class="scanbtn" style="margin-top:18px" onclick="identify()">CONTINUE</button>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section class="screen" id="s-app">
+    <div class="hero">
+      <div class="hrow">
+        <div class="hbrand"><span class="gold">Corti</span> × US Mobile</div>
+        <div class="table" id="who">US MOBILE</div>
+      </div>
+    </div>
+
+    <!-- MENU TAB -->
+    <div class="tab active" id="t-menu">
+      <div class="banner">
+        <div>
+          <div class="bt">20% members' rate</div>
+          <div class="bs">Already applied to every price below</div>
+        </div>
+        <div class="seal">−20%</div>
+      </div>
+      <div class="modes">
+        <div class="mode on" id="mode-now" onclick="pickMode(this)">Order now<small>To your table</small></div>
+        <div class="mode" id="mode-sched" onclick="openSchedule()">Schedule<small id="mode-sched-sub">Pick a time</small></div>
+      </div>
+      <div class="body">
+        <div class="cat"><span>Flash · next 2 hrs</span><div class="hair"></div></div>
+        <div class="combo" data-p="1000" data-o="1380">
+          <div style="flex:1"><div class="cn">Iced Latte + Brownie <span class="tagm">SAVE 27%</span></div><div class="cd">Afternoon treat combo</div><div class="cp"><span class="strike">Rs 1,380</span><span class="now">Rs 1,000</span></div></div>
+          <div class="qty"><button class="add" onclick="addOne(this)">+</button></div>
+        </div>
+
+        <div class="cat"><span>Combos</span><div class="hair"></div></div>
+        <div class="combo" data-p="950" data-o="1250">
+          <div style="flex:1"><div class="cn">Coffee + Croissant <span class="tagm">SAVE 24%</span></div><div class="cd">Cappuccino + butter croissant</div><div class="cp"><span class="strike">Rs 1,250</span><span class="now">Rs 950</span></div></div>
+          <div class="qty"><button class="add" onclick="addOne(this)">+</button></div>
+        </div>
+
+        <div class="cat"><span>Coffee</span><div class="hair"></div></div>
+        <div class="item" data-p="400" data-o="500"><div class="ic">{cup}</div><div><div class="iname">Espresso</div><div class="iprice"><span class="strike">Rs 500</span><span class="now">Rs 400</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="440" data-o="550"><div class="ic">{cup}</div><div><div class="iname">Americano</div><div class="iprice"><span class="strike">Rs 550</span><span class="now">Rs 440</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Latte</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Cappuccino</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="760" data-o="950"><div class="ic">{cup}</div><div><div class="iname">Flavoured Latte</div><div class="idesc">Caramel · hazelnut · coconut · vanilla · spanish</div><div class="iprice"><span class="strike">Rs 950</span><span class="now">Rs 760</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="560" data-o="700"><div class="ic">{cup}</div><div><div class="iname">Cortado</div><div class="iprice"><span class="strike">Rs 700</span><span class="now">Rs 560</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Cold Brews</span><div class="hair"></div></div>
+        <div class="item" data-p="480" data-o="600"><div class="ic">{cup}</div><div><div class="iname">Iced Americano</div><div class="iprice"><span class="strike">Rs 600</span><span class="now">Rs 480</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="784" data-o="980"><div class="ic">{cup}</div><div><div class="iname">Iced Latte</div><div class="iprice"><span class="strike">Rs 980</span><span class="now">Rs 784</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="816" data-o="1020"><div class="ic">{cup}</div><div><div class="iname">Flavoured Iced Latte</div><div class="idesc">Caramel · hazelnut · coconut · vanilla · spanish</div><div class="iprice"><span class="strike">Rs 1,020</span><span class="now">Rs 816</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Frappe</span><div class="hair"></div></div>
+        <div class="item" data-p="920" data-o="1150"><div class="ic">{cup}</div><div><div class="iname">Hazelnut Frappe</div><div class="iprice"><span class="strike">Rs 1,150</span><span class="now">Rs 920</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="920" data-o="1150"><div class="ic">{cup}</div><div><div class="iname">Mocha Frappe</div><div class="iprice"><span class="strike">Rs 1,150</span><span class="now">Rs 920</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="920" data-o="1150"><div class="ic">{cup}</div><div><div class="iname">Caramel Frappe</div><div class="iprice"><span class="strike">Rs 1,150</span><span class="now">Rs 920</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="920" data-o="1150"><div class="ic">{cup}</div><div><div class="iname">Vanilla Frappe</div><div class="iprice"><span class="strike">Rs 1,150</span><span class="now">Rs 920</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Iced Tea</span><div class="hair"></div></div>
+        <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Peach Iced Tea</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Mango Iced Tea</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Mixed Berry Iced Tea</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="680" data-o="850"><div class="ic">{cup}</div><div><div class="iname">Strawberry Iced Tea</div><div class="iprice"><span class="strike">Rs 850</span><span class="now">Rs 680</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Teas</span><div class="hair"></div></div>
+        <div class="item" data-p="200" data-o="250"><div class="ic">{cup}</div><div><div class="iname">Green Tea</div><div class="iprice"><span class="strike">Rs 250</span><span class="now">Rs 200</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="240" data-o="300"><div class="ic">{cup}</div><div><div class="iname">Tea</div><div class="iprice"><span class="strike">Rs 300</span><span class="now">Rs 240</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Refreshers</span><div class="hair"></div></div>
+        <div class="item" data-p="760" data-o="950"><div class="ic">{cup}</div><div><div class="iname">Strawberry Mojito</div><div class="iprice"><span class="strike">Rs 950</span><span class="now">Rs 760</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="760" data-o="950"><div class="ic">{cup}</div><div><div class="iname">Mango Passion</div><div class="iprice"><span class="strike">Rs 950</span><span class="now">Rs 760</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Mains</span><div class="hair"></div></div>
+        <div class="item" data-p="1160" data-o="1450"><div class="ic">{cup}</div><div><div class="iname">Chicken Sandwich</div><div class="iprice"><span class="strike">Rs 1,450</span><span class="now">Rs 1,160</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="1360" data-o="1700"><div class="ic">{cup}</div><div><div class="iname">Chicken &amp; Turkey Sandwich</div><div class="iprice"><span class="strike">Rs 1,700</span><span class="now">Rs 1,360</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="1200" data-o="1500"><div class="ic">{cup}</div><div><div class="iname">Croissant Sandwich</div><div class="iprice"><span class="strike">Rs 1,500</span><span class="now">Rs 1,200</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="440" data-o="550"><div class="ic">{cup}</div><div><div class="iname">Bagel with Cream Cheese</div><div class="iprice"><span class="strike">Rs 550</span><span class="now">Rs 440</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="520" data-o="650"><div class="ic">{cup}</div><div><div class="iname">Croissant with Stuffed Cheese</div><div class="iprice"><span class="strike">Rs 650</span><span class="now">Rs 520</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Appetizer</span><div class="hair"></div></div>
+        <div class="item" data-p="400" data-o="500"><div class="ic">{cup}</div><div><div class="iname">Plain Fries</div><div class="iprice"><span class="strike">Rs 500</span><span class="now">Rs 400</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="480" data-o="600"><div class="ic">{cup}</div><div><div class="iname">Masala Fries</div><div class="iprice"><span class="strike">Rs 600</span><span class="now">Rs 480</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="80" data-o="100"><div class="ic">{cup}</div><div><div class="iname">Dip</div><div class="iprice"><span class="strike">Rs 100</span><span class="now">Rs 80</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Dessert</span><div class="hair"></div></div>
+        <div class="item" data-p="320" data-o="400"><div class="ic">{cup}</div><div><div class="iname">Brownie</div><div class="iprice"><span class="strike">Rs 400</span><span class="now">Rs 320</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="200" data-o="250"><div class="ic">{cup}</div><div><div class="iname">Bagel</div><div class="iprice"><span class="strike">Rs 250</span><span class="now">Rs 200</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="320" data-o="400"><div class="ic">{cup}</div><div><div class="iname">Croissant</div><div class="iprice"><span class="strike">Rs 400</span><span class="now">Rs 320</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+
+        <div class="cat"><span>Water</span><div class="hair"></div></div>
+        <div class="item" data-p="280" data-o="350"><div class="ic">{cup}</div><div><div class="iname">Sparkling Water</div><div class="iprice"><span class="strike">Rs 350</span><span class="now">Rs 280</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+        <div class="item" data-p="200" data-o="250"><div class="ic">{cup}</div><div><div class="iname">Still Water</div><div class="iprice"><span class="strike">Rs 250</span><span class="now">Rs 200</span></div></div><div class="qty"><button class="add" onclick="addOne(this)">+</button></div></div>
+      </div>
+    </div>
+
+    <!-- OFFICE TAB -->
+    <div class="tab" id="t-office">
+      <div class="body">
+        <div class="panel">
+          <div class="ph">Order for the whole floor</div>
+          <div class="pp">One person orders, we deliver a single drop to your office, your team sorts it out. The more cups, the bigger the rate.</div>
+          <div class="tiers">
+            <div class="tier"><span class="tq">1–4 cups</span><span>Members' rate</span><span class="tg">20% off</span></div>
+            <div class="tier"><span class="tq">5–9 cups</span><span>Team rate</span><span class="tg">25% off</span></div>
+            <div class="tier"><span class="tq">10+ cups</span><span>Floor rate</span><span class="tg">30% off</span></div>
+          </div>
+          <div class="speed">
+            <div class="ic2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.4"><circle cx="12" cy="13" r="8"/><path d="M12 13V9M9 2h6" stroke-linecap="round"/></svg></div>
+            <div><b>7-minute promise.</b> <span style="color:var(--muted)">Late and it's on us.</span></div>
+          </div>
+          <button class="btn" style="margin-top:18px" onclick="go('s-done')">Start a floor order →</button>
+        </div>
+        <div class="panel">
+          <div class="ph" style="font-size:21px">Monthly Coffee Pass</div>
+          <div class="pp">Rs 3,000 for 30 coffees — one tap to redeem, never wait in a queue. Best value for regulars.</div>
+          <button class="btn" style="margin-top:14px" onclick="toast('☕ Coffee Pass activated — 30 coffees ready to use')">Activate pass</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REWARDS TAB -->
+    <div class="tab" id="t-rewards">
+      <div class="body">
+        <div class="lcard">
+          <div class="ltier">★ Gold Member · US Mobile</div>
+          <div class="lname" id="lname">Ali Raza</div>
+          <div class="stamps">
+            <div class="stamp full">{c}</div><div class="stamp full">{c}</div><div class="stamp full">{c}</div><div class="stamp full">{c}</div><div class="stamp full">{c}</div>
+            <div class="stamp full">{c}</div><div class="stamp full">{c}</div><div class="stamp">{c}</div><div class="stamp">{c}</div><div class="stamp free">FREE</div>
+          </div>
+          <div class="lnote">7 of 10 — your 10th coffee is on the house ☕</div>
+        </div>
+        <div class="cat" style="margin-top:24px"><span>Your perks</span><div class="hair"></div></div>
+        <div class="perk" onclick="togglePerk(this,'🎂 Birthday coffee is set — see you on the day!')"><div class="pi">{gift}</div><div style="flex:1"><div class="pn">Birthday coffee</div><div class="pd">A free drink every year on your birthday — automatically.</div></div><div class="ptoggle">Activate</div></div>
+        <div class="perk" onclick="togglePerk(this,'★ Your 20% founding rate is locked for 12 months')"><div class="pi">{star}</div><div style="flex:1"><div class="pn">Founding member rate</div><div class="pd">Your 20% is locked for 12 months. It won't go up.</div></div><div class="ptoggle">View</div></div>
+        <div class="perk" onclick="openVote()"><div class="pi">{vote}</div><div style="flex:1"><div class="pn">Vote the next drink</div><div class="pd">Help name & pick Corti's next seasonal blend.</div></div><div class="ptoggle">Vote</div></div>
+      </div>
+    </div>
+
+    <!-- EVENTS TAB -->
+    <div class="tab" id="t-events">
+      <div class="body">
+        <div class="partner">
+          <div class="pk">Founding Partnership</div>
+          <div class="ptt">Corti × US Mobile<br>better, together.</div>
+        </div>
+        <div class="ev ev1">
+          <div class="evtop"><span class="evtag">Launch Night</span></div>
+          <div class="evb">
+            <div class="evt">Board Game Night</div>
+            <div class="evd">Kick-off the partnership at US Mobile HQ. Games, free Corti coffee bar, and a lot of noise. Bring your team.</div>
+            <div class="evaction"><button class="evbtn" onclick="rsvp(this)">RSVP</button></div>
+          </div>
+        </div>
+        <div class="ev ev2">
+          <div class="evtop"><span class="evtag">One Day Only</span></div>
+          <div class="evb">
+            <div class="evt">The Corti Stall</div>
+            <div class="evd">A full Corti pop-up inside your office for one day. Try the menu, meet the baristas, claim launch-week perks.</div>
+            <div class="evaction"><button class="evbtn" onclick="rsvp(this)">RSVP</button></div>
+          </div>
+        </div>
+        <div class="ev ev3">
+          <div class="evtop"><span class="evtag">Your Space, On Us</span></div>
+          <div class="evb">
+            <div class="evt">Host at Corti Cafe</div>
+            <div class="evd">Team dinners, off-sites, celebrations — host your US Mobile events at Corti with a members' rate on the whole venue.</div>
+            <div class="evaction"><button class="evbtn" onclick="openHost()">Enquire</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- cart -->
+    <div class="cart" id="cart">
+      <div class="csave" id="csave"></div>
+      <button class="cbtn" onclick="go('s-done')">
+        <span class="c1"><span class="ccount" id="ccount">0</span> Place order</span>
+        <span class="ctotal" id="ctotal">Rs 0</span>
+      </button>
+    </div>
+
+    <!-- tab bar -->
+    <div class="tabbar">
+      <div class="tb on" data-t="t-menu" onclick="tab(this)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/></svg>Menu</div>
+      <div class="tb" data-t="t-office" onclick="tab(this)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M4 20V9l8-5 8 5v11" stroke-linecap="round"/><path d="M9 20v-5h6v5"/></svg>Office</div>
+      <div class="tb" data-t="t-rewards" onclick="tab(this)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3Z" stroke-linejoin="round"/></svg>Rewards</div>
+      <div class="tb" data-t="t-events" onclick="tab(this)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.4"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4M15 3v4" stroke-linecap="round"/></svg>Events</div>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section class="screen" id="s-done">
+    <div class="center">
+      <div class="check"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e3c789" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+      <div class="kicker">Order confirmed</div>
+      <div class="dtitle" style="margin-top:10px">Sit back —<br>it's on its way.</div>
+      <div class="eta">
+        <div class="lbl" id="etaLbl">Ready in</div>
+        <div class="big" id="etaBig">6 min</div>
+        <div class="ps" id="doneSub" style="color:var(--muted);font-size:13px">Served to Table 12 · +1 stamp earned</div>
+      </div>
+      <div class="rate">
+        <div class="rq">How was your last Corti?</div>
+        <div class="thumbs">
+          <button class="thumb" onclick="pickThumb(this)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 11v9H4v-9h3Zm0 0l5-8c1.5 0 2.5 1 2.5 2.5L13.5 9H19a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17.8 19H7" stroke-linejoin="round"/></svg></button>
+          <button class="thumb" onclick="pickThumb(this)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="transform:rotate(180deg)"><path d="M7 11v9H4v-9h3Zm0 0l5-8c1.5 0 2.5 1 2.5 2.5L13.5 9H19a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17.8 19H7" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div class="footerpad">
+        <button class="btn" onclick="reset()">Order something else</button>
+        <button class="btn ghost" onclick="go('s-qr')">Restart demo</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheet-bg" onclick="closeSheet()"></div>
+    <div class="sheet-card" id="sheetCard"></div>
+  </div>
+
+</div>
+
+<script>
+  const CUP='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.2"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3c0 1-.8 1.5-.8 2.5M11.5 3c0 1-.8 1.5-.8 2.5" stroke-linecap="round"/></svg>';
+  const SM='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/></svg>';
+  const GIFT='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.3"><rect x="4" y="9" width="16" height="11" rx="1"/><path d="M2 9h20M12 9v11M12 9S9 3 6.5 5 8 9 12 9Zm0 0s3-6 5.5-4S16 9 12 9Z" stroke-linejoin="round"/></svg>';
+  const STAR='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.3"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3Z" stroke-linejoin="round"/></svg>';
+  const VOTE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a86a" stroke-width="1.3"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  document.querySelectorAll('.ic').forEach(e=>{if(e.textContent.trim()==='{cup}')e.innerHTML=CUP});
+  document.querySelectorAll('.stamp').forEach(e=>{if(e.textContent.trim()==='{c}')e.innerHTML=SM});
+  document.querySelectorAll('.pi').forEach(e=>{
+    let t=e.textContent.trim();
+    e.innerHTML = t==='{gift}'?GIFT : t==='{star}'?STAR : t==='{vote}'?VOTE : e.innerHTML;
+  });
+
+  let cart={};
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='s-done'){
+      if(mode==='sched'){
+        document.getElementById('etaLbl').textContent='Ready at';
+        document.getElementById('etaBig').textContent=schedTime||'—';
+        document.getElementById('doneSub').textContent='Reserved for '+who+' · +1 stamp earned';
+      }else{
+        document.getElementById('etaLbl').textContent='Ready in';
+        document.getElementById('etaBig').textContent='6 min';
+        document.getElementById('doneSub').textContent='Bringing it to '+who+' · +1 stamp earned';
+      }
+    }
+    syncCart();
+    window.scrollTo(0,0);
+  }
+  function tab(el){
+    document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));
+    el.classList.add('on');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(el.dataset.t).classList.add('active');
+    syncCart();
+  }
+  let mode='now', schedTime='', who='US Mobile';
+  function identify(){
+    let v=document.getElementById('who-input').value.trim();
+    if(!v){toast('Enter your US Mobile ID or name');return;}
+    who=v;
+    document.getElementById('who').textContent = v.toUpperCase();
+    document.getElementById('lname').textContent = v;
+    go('s-app');
+    toast('Welcome, '+v+' 👋');
+  }
+  function pickMode(){
+    document.getElementById('mode-sched').classList.remove('on');
+    document.getElementById('mode-now').classList.add('on');
+    document.getElementById('mode-sched-sub').textContent='Pick a time';
+    mode='now'; schedTime='';
+  }
+  function pickThumb(el){el.parentElement.querySelectorAll('.thumb').forEach(t=>t.classList.remove('pick'));el.classList.add('pick');toast('Thanks for the feedback!')}
+
+  let toastT;
+  function toast(msg){
+    let t=document.getElementById('toast');
+    t.textContent=msg;t.classList.add('show');
+    clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);
+  }
+
+  /* bottom sheet */
+  function openSheet(html){document.getElementById('sheetCard').innerHTML='<div class="grab"></div>'+html;document.getElementById('sheet').classList.add('show')}
+  function closeSheet(){document.getElementById('sheet').classList.remove('show')}
+
+  /* schedule */
+  let tmpSlot='';
+  function openSchedule(){
+    tmpSlot=schedTime;
+    const times=['9:00 AM','10:30 AM','12:00 PM','2:00 PM','4:00 PM','6:00 PM','8:00 PM','10:00 PM','11:30 PM'];
+    const slots=times.map(t=>'<div class="slot'+(t===schedTime?' on':'')+'" onclick="selSlot(this,\''+t+'\')">'+t+'</div>').join('');
+    openSheet('<div class="sh-title">When should it be ready?</div><div class="sh-sub">We’ll have it waiting at your table. Last orders 11:30 PM.</div><div class="slots">'+slots+'</div><div class="sh-actions"><button class="btn ghost" onclick="closeSheet()">Cancel</button><button class="btn" onclick="confirmSchedule()">Confirm time</button></div>');
+  }
+  function selSlot(el,t){el.parentElement.querySelectorAll('.slot').forEach(s=>s.classList.remove('on'));el.classList.add('on');tmpSlot=t}
+  function confirmSchedule(){
+    if(!tmpSlot){toast('Pick a time first');return;}
+    schedTime=tmpSlot; mode='sched';
+    document.getElementById('mode-now').classList.remove('on');
+    document.getElementById('mode-sched').classList.add('on');
+    document.getElementById('mode-sched-sub').textContent='Ready at '+schedTime;
+    closeSheet(); toast('⏰ Scheduled for '+schedTime);
+  }
+
+  /* host enquiry */
+  function openHost(){
+    openSheet('<div class="sh-title">Host at Corti</div><div class="sh-sub">Tell us a little — we’ll come back with a plan and a quote.</div>'+
+      '<div class="field"><label>WHAT’S THE OCCASION?</label><input id="h1" placeholder="Team dinner, off-site, celebration…"></div>'+
+      '<div class="field"><label>HOW MANY GUESTS?</label><input id="h2" placeholder="e.g. 25" inputmode="numeric"></div>'+
+      '<div class="field"><label>PREFERRED DATE & TIME</label><input id="h3" placeholder="e.g. 20 June, evening"></div>'+
+      '<div class="field"><label>DETAILS — WHAT / WHY / ANY REQUESTS</label><textarea id="h4" placeholder="Food preferences, setup, budget, anything else…"></textarea></div>'+
+      '<div class="sh-actions"><button class="btn ghost" onclick="closeSheet()">Cancel</button><button class="btn" onclick="submitHost()">Send enquiry</button></div>');
+  }
+  function submitHost(){
+    if(!document.getElementById('h1').value.trim()){toast('Tell us the occasion first');return;}
+    closeSheet(); toast('✅ Enquiry sent — we’ll reply shortly');
+  }
+
+  /* vote */
+  let tmpVote='';
+  function openVote(){
+    tmpVote='';
+    const opts=['Pistachio Latte','Spiced Chai Cortado','Salted Caramel Cold Brew'];
+    const html=opts.map(o=>'<div class="voteopt" onclick="selVote(this)"><div class="vradio"></div><div class="vn">'+o+'</div></div>').join('');
+    openSheet('<div class="sh-title">Vote the next blend</div><div class="sh-sub">The winner joins the Corti × US Mobile menu.</div><div class="votes">'+html+'</div><div class="sh-actions"><button class="btn ghost" onclick="closeSheet()">Cancel</button><button class="btn" onclick="confirmVote()">Submit vote</button></div>');
+  }
+  function selVote(el){el.parentElement.querySelectorAll('.voteopt').forEach(v=>v.classList.remove('on'));el.classList.add('on');tmpVote=el.querySelector('.vn').textContent}
+  function confirmVote(){
+    if(!tmpVote){toast('Pick one first');return;}
+    closeSheet(); toast('🗳️ Vote saved: '+tmpVote);
+    const p=[...document.querySelectorAll('.perk')].find(x=>x.querySelector('.ptoggle')&&/Vote/.test(x.querySelector('.ptoggle').textContent));
+    if(p){p.classList.add('on');p.querySelector('.ptoggle').textContent='✓ Voted'}
+  }
+
+  /* perks */
+  function togglePerk(el,msg){
+    const tog=el.querySelector('.ptoggle');
+    if(!el.dataset.orig)el.dataset.orig=tog.textContent;
+    el.classList.toggle('on');
+    if(el.classList.contains('on')){tog.textContent='✓ On';toast(msg)}
+    else{tog.textContent=el.dataset.orig}
+  }
+
+  /* rsvp with 30-min cancel window */
+  function rsvp(b){
+    const wrap=b.parentElement;
+    b.classList.add('done'); b.textContent='✓ You’re in';
+    let c=wrap.querySelector('.evcancel');
+    if(!c){c=document.createElement('div');c.className='evcancel';wrap.appendChild(c)}
+    let secs=30*60;
+    function draw(){
+      const m=Math.floor(secs/60), s=secs%60;
+      c.innerHTML='Cancel within <b>'+m+':'+String(s).padStart(2,'0')+'</b><a>Cancel RSVP</a>';
+      c.querySelector('a').onclick=function(){clearInterval(iv);b.classList.remove('done');b.textContent='RSVP';c.remove();toast('RSVP cancelled')};
+    }
+    draw();
+    const iv=setInterval(function(){secs--;if(secs<=0){clearInterval(iv);c.innerHTML='<span>Confirmed — cancellation window closed</span>'}else draw()},1000);
+    toast('🎉 You’re on the list!');
+  }
+
+  function count(){return Object.values(cart).reduce((a,b)=>a+b,0)}
+  function items(){return document.querySelectorAll('#t-menu [data-p]')}
+  function total(){let t=0;items().forEach((it,i)=>t+=(cart[i]||0)*+it.dataset.p);return t}
+  function saved(){let s=0;items().forEach((it,i)=>s+=(cart[i]||0)*(+it.dataset.o-+it.dataset.p));return s}
+  function menuOpen(){return document.getElementById('s-app').classList.contains('active') && document.getElementById('t-menu').classList.contains('active')}
+  function syncCart(){document.getElementById('cart').classList.toggle('show', menuOpen() && count()>0)}
+
+  function render(it,i){
+    let q=cart[i]||0, box=it.querySelector('.qty');
+    box.classList.toggle('has',q>0);
+    box.innerHTML = q>0
+      ? '<div class="stepper"><button class="sbtn" onclick="minus(this)">−</button><span class="qn">'+q+'</span><button class="sbtn" onclick="plus(this)">+</button></div>'
+      : '<button class="add" onclick="addOne(this)">+</button>';
+  }
+  function idx(b){return [...items()].indexOf(b.closest('[data-p]'))}
+  function addOne(b){let i=idx(b);cart[i]=(cart[i]||0)+1;render(b.closest('[data-p]'),i);bar()}
+  function plus(b){let i=idx(b);cart[i]++;render(b.closest('[data-p]'),i);bar()}
+  function minus(b){let i=idx(b);cart[i]--;if(cart[i]<=0)delete cart[i];render(b.closest('[data-p]'),i);bar()}
+  function bar(){
+    syncCart();
+    document.getElementById('ccount').textContent=count();
+    document.getElementById('ctotal').textContent='Rs '+total().toLocaleString();
+    let s=saved();
+    document.getElementById('csave').textContent= s>0 ? 'You save Rs '+s.toLocaleString()+' as a US Mobile member' : '';
+  }
+  function reset(){cart={};items().forEach((it,i)=>render(it,i));bar();pickMode();document.querySelector('.tb[data-t="t-menu"]').click();go('s-app')}
+</script>
+</body>
+</html>
