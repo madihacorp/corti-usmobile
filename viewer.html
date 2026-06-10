@@ -55,11 +55,16 @@
   const ago=t=>{const s=Math.floor((Date.now()-new Date(t))/1000);
     if(s<60)return s+"s ago";if(s<3600)return Math.floor(s/60)+"m ago";return Math.floor(s/3600)+"h ago";};
 
+  let lastSig="";
   async function load(){
     try{
       const r=await fetch(BASE+"/orders?select=order_no,status,total,note,source,created_at,order_items(name,qty,unit_price)&order=created_at.desc&limit=12",{headers:H});
       const data=await r.json();
-      render(Array.isArray(data)?data:[]);
+      const list=Array.isArray(data)?data:[];
+      const sig=JSON.stringify(list.map(o=>[o.order_no,o.status,o.total]));
+      if(sig===lastSig)return;        // nothing changed → don't redraw (no blink)
+      lastSig=sig;
+      render(list);
     }catch(e){/* keep last view */}
   }
 
