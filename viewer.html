@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Corti · Live Order Viewer (TEST)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#16110d;color:#efe7db;min-height:100vh;padding:18px 14px 40px}
+  .head{text-align:center;margin-bottom:8px}
+  .brand{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700}
+  .brand span{color:#c9a86a}
+  .kicker{color:#9c8e7d;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+  .live{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:12px;color:#cbb98f;
+    background:#1d1712;border:1px solid #2c2218;padding:6px 14px;border-radius:30px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#5ad17f;box-shadow:0 0 0 0 rgba(90,209,127,.6);animation:p 1.6s infinite}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(90,209,127,.5)}70%{box-shadow:0 0 0 9px rgba(90,209,127,0)}100%{box-shadow:0 0 0 0 rgba(90,209,127,0)}}
+  .wrap{max-width:560px;margin:18px auto 0;display:flex;flex-direction:column;gap:12px}
+  .card{background:#1d1712;border:1px solid #2c2218;border-radius:16px;padding:15px 16px;animation:fade .4s ease}
+  .card.test{border-color:#c9a86a;box-shadow:0 0 0 1px #c9a86a,0 14px 40px rgba(201,168,106,.18)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .row1{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .no{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700}
+  .badge{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 9px;border-radius:20px;font-weight:600}
+  .b-test{background:#c9a86a;color:#16110d}
+  .b-open{background:#3a2f20;color:#e3c789}
+  .b-paid{background:#1f3a28;color:#7fe0a3}
+  .src{font-size:11px;color:#9c8e7d;margin-top:3px}
+  .items{margin-top:11px;border-top:1px dashed #2c2218;padding-top:10px;display:flex;flex-direction:column;gap:6px}
+  .it{display:flex;justify-content:space-between;font-size:13px;color:#cdbfad}
+  .it span:first-child{color:#efe7db}
+  .it .q{color:#9c8e7d}
+  .tot{display:flex;justify-content:space-between;margin-top:11px;font-weight:600;font-size:15px}
+  .tot .g{color:#e3c789}
+  .time{font-size:11px;color:#7d7060;margin-top:7px}
+  .empty{text-align:center;color:#7d7060;padding:40px 0;font-size:14px}
+  .note{font-size:12px;color:#cbb98f;background:#241c12;border-radius:9px;padding:7px 10px;margin-top:9px}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand"><span>Corti</span> POS</div>
+    <div class="kicker">Live Order Viewer · Test</div>
+    <div class="live"><span class="dot"></span> Connected to live POS database</div>
+  </div>
+  <div class="wrap" id="wrap"><div class="empty">Loading live orders…</div></div>
+
+<script>
+  const BASE="https://wcerbpgpdunszudczqbu.supabase.co/rest/v1";
+  const KEY="sb_publishable_wFE1gAnkLtpAhpDaDYy9kg_s2PN1HEG";
+  const H={apikey:KEY,Authorization:"Bearer "+KEY};
+  const money=n=>"Rs "+Number(n||0).toLocaleString("en-PK");
+  const ago=t=>{const s=Math.floor((Date.now()-new Date(t))/1000);
+    if(s<60)return s+"s ago";if(s<3600)return Math.floor(s/60)+"m ago";return Math.floor(s/3600)+"h ago";};
+
+  async function load(){
+    try{
+      const r=await fetch(BASE+"/orders?select=order_no,status,total,note,source,created_at,order_items(name,qty,unit_price)&order=created_at.desc&limit=12",{headers:H});
+      const data=await r.json();
+      render(Array.isArray(data)?data:[]);
+    }catch(e){/* keep last view */}
+  }
+
+  function render(list){
+    const w=document.getElementById('wrap');
+    if(!list.length){w.innerHTML='<div class="empty">No orders yet.</div>';return;}
+    w.innerHTML=list.map(o=>{
+      const isTest=(o.note||"").toUpperCase().includes("TEST")||(o.source||"")==="us_mobile";
+      const st=o.status||"open";
+      const badge=isTest?'<span class="badge b-test">US Mobile · Test</span>'
+        :st==='paid'?'<span class="badge b-paid">Paid</span>'
+        :'<span class="badge b-open">'+st+'</span>';
+      const items=(o.order_items||[]).map(i=>
+        '<div class="it"><span>'+i.name+' <span class="q">×'+(+i.qty)+'</span></span><span>'+money(i.unit_price)+'</span></div>'
+      ).join('')||'<div class="it"><span class="q">No items</span></div>';
+      return '<div class="card'+(isTest?' test':'')+'">'
+        +'<div class="row1"><div class="no">#'+(o.order_no??'—')+'</div>'+badge+'</div>'
+        +(o.source?'<div class="src">Source: '+o.source+'</div>':'')
+        +'<div class="items">'+items+'</div>'
+        +'<div class="tot"><span>Total</span><span class="g">'+money(o.total)+'</span></div>'
+        +(o.note?'<div class="note">📝 '+o.note+'</div>':'')
+        +'<div class="time">'+ago(o.created_at)+'</div></div>';
+    }).join('');
+  }
+
+  load();
+  setInterval(load,2000);
+</script>
+</body>
+</html>
